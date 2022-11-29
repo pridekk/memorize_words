@@ -1,0 +1,8 @@
+{
+    "_id": "read",
+    "meanings": 
+    [ 
+        { "meaning": "읽다", "verb": "v" },
+        {"meaning": "읽기", "verb": "n"}
+    ]
+}
