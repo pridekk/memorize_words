@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import users, words
+from .routes import users, words
 
 app = FastAPI()
 
