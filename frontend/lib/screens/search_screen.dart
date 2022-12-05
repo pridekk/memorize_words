@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/constants.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -66,6 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         onTap: (){
                           setState(() {
                             _tapped = true;
+                            getWords("r");
                           });
                         },
                       ),
@@ -77,5 +80,18 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       );
   }
+
+}
+
+void getWords(String query) async {
+  try {
+    var resp = await dio.get("/api/v1/words/search?query=$query");
+
+    print(resp.data);
+  }catch(e){
+
+    print(e);
+  }
+
 
 }
