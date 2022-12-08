@@ -69,7 +69,12 @@ class User(BaseModel):
     email: str | None = None
     joined_at: datetime
     words: List[UserWord]
-    disabled: bool
+    disabled: bool | None = False
+
+    def get_meanings(self, query: str):
+        for word in self.words:
+            if word.word == query:
+                return word.meanings
 
 
 class UserInDB(User):

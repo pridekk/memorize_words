@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 class Meaning(BaseModel):
     m_id: str
     meaning: str
-    verb: str
+    verb: str | None = None
     s_count: int
     d_count: int
     created_at: datetime
