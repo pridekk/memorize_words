@@ -5,6 +5,8 @@ from typing import List
 import uuid
 import pymongo
 from datetime import datetime
+from opentelemetry.instrumentation.pymongo import PymongoInstrumentor
+
 from fastapi.logger import logger
 
 from ..models.users import User
@@ -14,6 +16,8 @@ MONGO_HOST = os.getenv("MONGO_HOST", 'localhost:27017')
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", 'words')
 MONGO_USER = os.getenv("MONGO_USER", "root")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "example")
+
+PymongoInstrumentor().instrument()
 
 client = pymongo.MongoClient(host=[MONGO_HOST], username=MONGO_USER, password=MONGO_PASSWORD)
 words_db = client.get_database(MONGO_DB_NAME)
