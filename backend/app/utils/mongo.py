@@ -45,7 +45,7 @@ def update_word_search_count(word: str):
     )
 
 
-def get_words_by_query(query: str):
+def get_words_by_query(query: str, page: int, size: int):
     regex = re.compile(query, re.IGNORECASE)
 
     words = english_collection.find({"_id": regex}, {"_id": 1, "s_count": 1, "priority": 1})
@@ -56,7 +56,7 @@ def get_words_by_query(query: str):
 
     result.sort(reverse=True)
 
-    return result
+    return result[(page-1)*size: page*size]
 
 
 def increase_delete_count(word: str, m_id: str):

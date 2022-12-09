@@ -9,8 +9,8 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[Word])
-def get_words(query: str, user_id=Depends(get_user_id)):
-    result: List[Word] = get_words_by_query(query)
+def get_words(query: str,  page: int = 1, size: int = 20, user_id=Depends(get_user_id)):
+    result: List[Word] = get_words_by_query(query, page, size)
 
     return result
 

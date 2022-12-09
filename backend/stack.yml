@@ -24,12 +24,12 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
-  app:
-    image: pridekk/memorize_api:latest
-    depends_on:
-      - mongo
-    ports:
-      - 8999:80
+#  app:
+#    image: pridekk/memorize_api:latest
+#    depends_on:
+#      - mongo
+#    ports:
+#      - 8999:80
 
 volumes:
   db:
