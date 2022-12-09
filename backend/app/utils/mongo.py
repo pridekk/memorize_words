@@ -21,20 +21,31 @@ english_collection = words_db.get_collection("english")
 user_collection = words_db.get_collection("users")
 
 
-def get_meanings_by_id(word: str):
-    word = english_collection.find_one({"_id": word})
+def get_meanings_by_query(query: str):
+    doc = english_collection.find_one({"_id": query})
 
-    if word:
-        word = Word(**word)
+    if doc:
+        doc = Word(**doc)
 
-        meanings = word.meanings
+        update_word_search_count(query)
+
+        meanings = doc.meanings
 
         meanings.sort(reverse=True)
+        return meanings
 
-    return meanings
+    else:
+        return []
 
 
-def get_words_by_id(query: str):
+def update_word_search_count(word: str):
+    english_collection.update_one(
+        {"_id": word},
+        {"$inc": {"s_count": 1}}
+    )
+
+
+def get_words_by_query(query: str):
     regex = re.compile(query, re.IGNORECASE)
 
     words = english_collection.find({"_id": regex}, {"_id": 1, "s_count": 1, "priority": 1})
@@ -170,3 +181,14 @@ def add_new_meanings_to_user_word(user_id: int, word: str, meanings: List[str]):
             }
         )
 
+
+def get_user_words(user_id=1):
+    user_words = user_collection.find_one(
+        {
+            "_id": user_id,
+        },
+        {"words": 1}
+    )
+
+    if user_words:
+        return user_words.get("words")

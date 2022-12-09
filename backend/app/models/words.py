@@ -26,7 +26,7 @@ class Word(BaseModel):
     word: Optional[str] = Field(alias="_id")
     s_count: int
     priority: int
-    meanings: List[Meaning]
+    meanings: List[Meaning] | None = None
 
     def __eq__(self, other):
         return self.priority == other.priority and self.s_count == other.s_count

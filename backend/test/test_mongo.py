@@ -3,11 +3,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from ..app.utils.mongo import get_meanings_by_id, get_words_by_query, increase_delete_count
+from ..app.utils.mongo import get_meanings_by_query, get_words_by_query, increase_delete_count
 
 
 def test_get_meanings():
-    result = get_meanings_by_id("read")
+    result = get_meanings_by_query("read")
 
     assert len(result) >= 3
     assert result[0].priority == 1

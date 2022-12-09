@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from ..models.words import WordRequest
 from ..utils.users import *
-from ..utils.mongo import add_user_word
+from ..utils.mongo import add_user_word, get_user_words
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
@@ -44,3 +44,10 @@ def add_words(word: WordRequest, user_id=Depends(get_user_id)):
     return {
         "message": "등록되었습니다."
     }
+
+
+@router.get("/me/words")
+def get_my_words(page=1, size=20, sort_by="updated_at", direction="desc", user_id=Depends(get_user_id)):
+
+    return get_user_words(user_id)
+
