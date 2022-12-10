@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/search_word.dart';
 import 'package:frontend/utils/constants.dart';
 
+import '../models/word_meaning.dart';
+
 class SearchScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _SearchScreenState();
@@ -12,10 +14,12 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
 
   bool _tapped = false;
+  bool _meaning = false;
   late TextEditingController _controller;
   late ScrollController _scrollController;
   late List<SearchWord> items;
   var searchText = '';
+  late List<WordMeaning> meanings;
   var currentPage = 1;
   var moreData = true;
   var size = 10;
@@ -28,6 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _scrollController.addListener(onScroll);
 
     items = [];
+    meanings = [];
 
   }
 
@@ -74,6 +79,7 @@ class _SearchScreenState extends State<SearchScreen> {
           FocusScope.of(context).unfocus();
           setState(() {
             _tapped = false;
+            searchText = '';
           });
         },
         child: Scaffold(
@@ -85,16 +91,22 @@ class _SearchScreenState extends State<SearchScreen> {
                 items = [];
               });
             },
-            child: Container(
-              height: double.infinity,
+
+            child:
+
+              Container(
+
               alignment: Alignment.center,
-              child: Column(
-                  mainAxisAlignment: _tapped ? MainAxisAlignment.center : MainAxisAlignment.start,
-                  crossAxisAlignment: _tapped? CrossAxisAlignment.start: CrossAxisAlignment.center,
+              child:
+
+              Column(
+                  mainAxisAlignment:  MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: TextField(
                         controller: _controller,
+
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.search),
                           hintText: 'Type word for searching',
@@ -121,7 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         },
                       ),
                     ),
-                    if(items.isNotEmpty)
+                    if(items.isNotEmpty && _tapped == true && _meaning == false)
                     Expanded(
                       flex: 9,
                       child: RefreshIndicator(
@@ -142,7 +154,15 @@ class _SearchScreenState extends State<SearchScreen> {
                           itemCount: items.length,
                           itemBuilder: (context, index){
                             return ListTile(
-                              title: Text(items[index].id)
+                              title: GestureDetector(
+                                  onTap: () async {
+                                    var meanings = await getMeaning(items[index].id, 1, size);
+                                    setState(() {
+                                      _meaning = true;
+                                    });
+                                  },
+                                  child: Text(items[index].id)
+                              )
                             );
                           },
                         ),
@@ -164,6 +184,15 @@ class _SearchScreenState extends State<SearchScreen> {
           return SearchWord.fromJson(json);
         }).toList();
 
+  }
+
+  Future<List<WordMeaning>> getMeaning(String query, int page, int size) async{
+
+    var resp = await dio.get("/api/v1/words/$query/meanings/?page=$page&size=$size");
+
+    return (resp.data).map<WordMeaning>((json){
+      return WordMeaning.fromJson(json);
+    }).toList();
   }
 
 }
