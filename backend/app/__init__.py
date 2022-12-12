@@ -22,7 +22,7 @@ logging.basicConfig(
 from opentelemetry.sdk.extension.aws.trace import AwsXRayIdGenerator
 
 # Sends generated traces in the OTLP format to an ADOT Collector running on port 4317
-otlp_exporter = OTLPSpanExporter(endpoint="http://54.180.126.220:4317")
+otlp_exporter = OTLPSpanExporter(endpoint="http://otel-dev.myspec.io:4317")
 # Processes traces in batches as opposed to immediately one after the other
 span_processor = BatchSpanProcessor(otlp_exporter)
 # Configures the Global Tracer Provider
@@ -44,7 +44,7 @@ def fake_decode_token(token):
         username=token + "fakedecoded", email="john@example.com", full_name="John Doe"
     )
 
-
+print(__name__)
 app = FastAPI()
 FastAPIInstrumentor.instrument_app(app)
 
