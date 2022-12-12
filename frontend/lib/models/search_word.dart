@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class SearchWord {
   final String id;
   final int selectCount;

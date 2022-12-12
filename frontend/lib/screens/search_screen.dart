@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/models/search_word.dart';
 import 'package:frontend/utils/constants.dart';
-
 import '../models/word_meaning.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -17,6 +17,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _meaning = false;
   late TextEditingController _controller;
   late ScrollController _scrollController;
+  late ScrollController _meaningScrollController;
   late List<SearchWord> items;
   var searchText = '';
   late List<WordMeaning> meanings;
@@ -30,6 +31,8 @@ class _SearchScreenState extends State<SearchScreen> {
     _controller = TextEditingController();
     _scrollController = ScrollController();
     _scrollController.addListener(onScroll);
+    _meaningScrollController = ScrollController();
+    _meaningScrollController.addListener(onMeaningScroll);
 
     items = [];
     meanings = [];
@@ -52,6 +55,14 @@ class _SearchScreenState extends State<SearchScreen> {
             moreData = false;
           });
         }
+
+      }
+    }
+  }
+  void onMeaningScroll() async {
+    if(_meaningScrollController.position.pixels == _meaningScrollController.position.maxScrollExtent){
+      if(moreData){
+
 
       }
     }
@@ -115,6 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         onTap: (){
                           setState(() {
                             _tapped = true;
+                            _meaning = false;
                           });
                         },
                         onChanged: (text) async {
@@ -148,6 +160,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           }
                         },
                         child: ListView.builder(
+                          key: const ValueKey(1),
                           controller: _scrollController,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
@@ -156,10 +169,14 @@ class _SearchScreenState extends State<SearchScreen> {
                             return ListTile(
                               title: GestureDetector(
                                   onTap: () async {
-                                    var meanings = await getMeaning(items[index].id, 1, size);
-                                    setState(() {
-                                      _meaning = true;
-                                    });
+                                    var re_meanings = await getMeaning(items[index].id, 1, size);
+                                    log(re_meanings.length.toString());
+                                    if(re_meanings.isNotEmpty) {
+                                      setState(() {
+                                        _meaning = true;
+                                        meanings = re_meanings;
+                                      });
+                                    }
                                   },
                                   child: Text(items[index].id)
                               )
@@ -168,6 +185,27 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                     ),
+                    if(_meaning == true && meanings.isNotEmpty)
+                    Expanded(
+                        child: ListView.builder(
+                          key: const ValueKey(2),
+
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: meanings.length,
+                          itemBuilder: (context, index){
+                            return ListTile(
+                                title: GestureDetector(
+                                    onTap: () async {
+
+                                    },
+                                    child: Text(meanings[index].meaning)
+                                )
+                            );
+                          },
+                        ),
+                      ),
+
                   ]
               ),
             ),
@@ -179,7 +217,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<List<SearchWord>> getWords(String query, int page, int size) async {
 
       var resp = await dio.get("/api/v1/words?query=$query&page=$page&size=$size");
-
+      log(resp.statusCode.toString());
       return (resp.data).map<SearchWord>((json) {
           return SearchWord.fromJson(json);
         }).toList();
