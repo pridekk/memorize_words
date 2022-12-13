@@ -24,6 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
   var currentPage = 1;
   var moreData = true;
   var size = 10;
+  late List<bool> checked;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     items = [];
     meanings = [];
+    checked = [];
 
   }
 
@@ -115,6 +117,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
+                      flex: 1,
                       child: TextField(
                         controller: _controller,
 
@@ -175,6 +178,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       setState(() {
                                         _meaning = true;
                                         meanings = re_meanings;
+                                        checked = List<bool>.generate(re_meanings.length, (index) => false);
                                       });
                                     }
                                   },
@@ -187,6 +191,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     if(_meaning == true && meanings.isNotEmpty)
                     Expanded(
+                      flex: 9,
                         child: ListView.builder(
                           key: const ValueKey(2),
 
@@ -194,24 +199,47 @@ class _SearchScreenState extends State<SearchScreen> {
                           shrinkWrap: true,
                           itemCount: meanings.length,
                           itemBuilder: (context, index){
-                            return ListTile(
+                            return CheckboxListTile(
                                 title: GestureDetector(
                                     onTap: () async {
-
+                                      setState(() {
+                                        checked[index] = !checked[index];
+                                      });
                                     },
                                     child: Text(meanings[index].meaning)
-                                )
+                                ), value: checked[index],
+                              onChanged: (bool? value) {
+                                  setState(() {
+                                    checked[index] = value!;
+                                  });
+                              },
                             );
                           },
                         ),
                       ),
+                    if(isChecked())
+                    Expanded(
+                      flex: 1,
+                      child: InkWell(
+                          onTap: () async {
+                            setState(() {
 
+                            });
+                          },
+                          child: Text("내 단어장에 등록하기")
+                      ),
+                    ),
                   ]
               ),
             ),
           ),
         ),
       );
+  }
+
+  bool isChecked(){
+    print(checked);
+    return checked.contains(true);
   }
 
   Future<List<SearchWord>> getWords(String query, int page, int size) async {
